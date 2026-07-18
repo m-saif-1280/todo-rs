@@ -1,11 +1,15 @@
 use std::time::Duration;
 
 use crossterm::event::{self, Event, KeyCode, KeyModifiers};
-use ratatui::{DefaultTerminal, crossterm};
+use ratatui::{DefaultTerminal, crossterm, layout::Layout, macros::constraint};
+
+use crate::Task;
+use crate::widgets::TaskWidget;
 
 pub struct App {
     terminal: DefaultTerminal,
     is_running: bool,
+    tasks: Vec<Task>,
 }
 
 impl App {
@@ -13,6 +17,18 @@ impl App {
         Self {
             terminal: ratatui::init(),
             is_running: true,
+            tasks: (1..=10)
+                .into_iter()
+                .map(|n| {
+                    let mut t = Task::new(&format!("Task #{n}"));
+                    if n % 2 == 0 {
+                        t.toggle_done();
+                        t
+                    } else {
+                        t
+                    }
+                })
+                .collect(),
         }
     }
 }
@@ -23,7 +39,18 @@ impl App {
     }
     pub fn draw(&mut self) {
         let _ = self.terminal.draw(|frame| {
-            frame.render_widget("Hello World!", frame.area());
+            let (task_widgets, constraints): (Vec<_>, Vec<_>) = self
+                .tasks
+                .iter()
+                .map(|task| (task, constraint!(==3)))
+                .unzip();
+
+            let chunks = Layout::vertical(constraints).split(frame.area());
+            let chunks = chunks.into_iter();
+
+            for (task_widget, chunk) in task_widgets.into_iter().zip(chunks) {
+                frame.render_widget(task_widget, *chunk);
+            }
         });
     }
 
