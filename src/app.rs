@@ -1,15 +1,18 @@
 use std::time::Duration;
 
 use crossterm::event::{self, Event, KeyCode, KeyModifiers};
-use ratatui::{DefaultTerminal, crossterm, layout::Layout, macros::constraint};
+use ratatui::text::Line;
+use ratatui::widgets::Block;
+use ratatui::{DefaultTerminal, crossterm};
+use tui_widget_list::{ListBuilder, ListState, ListView};
 
 use crate::Task;
-use crate::widgets::TaskWidget;
 
 pub struct App {
     terminal: DefaultTerminal,
     is_running: bool,
     tasks: Vec<Task>,
+    tasklist_state: ListState,
 }
 
 impl App {
@@ -29,6 +32,7 @@ impl App {
                     }
                 })
                 .collect(),
+            tasklist_state: ListState::default(),
         }
     }
 }
@@ -39,18 +43,13 @@ impl App {
     }
     pub fn draw(&mut self) {
         let _ = self.terminal.draw(|frame| {
-            let (task_widgets, constraints): (Vec<_>, Vec<_>) = self
-                .tasks
-                .iter()
-                .map(|task| (task, constraint!(==3)))
-                .unzip();
-
-            let chunks = Layout::vertical(constraints).split(frame.area());
-            let chunks = chunks.into_iter();
-
-            for (task_widget, chunk) in task_widgets.into_iter().zip(chunks) {
-                frame.render_widget(task_widget, *chunk);
-            }
+            let tasklist_builder = ListBuilder::new(|context| {
+                let task = &self.tasks[context.index];
+                (task, 3)
+            });
+            let list_view = ListView::new(tasklist_builder, self.tasks.len())
+                .block(Block::bordered().title_top(Line::from(" Your tasks ").centered()));
+            frame.render_stateful_widget(list_view, frame.area(), &mut self.tasklist_state);
         });
     }
 
