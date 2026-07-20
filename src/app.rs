@@ -46,8 +46,11 @@ impl App {
         let _ = self.terminal.draw(|frame| {
             let tasklist_builder = ListBuilder::new(|context| {
                 let task = &self.tasks[context.index];
+                let task_widget =
+                    TaskWidget::new(task, context.is_selected, context.cross_axis_size);
+                let height = task_widget.calc_height();
 
-                (TaskWidget::new(task, context.is_selected), 3)
+                (task_widget, height)
             });
             let list_view = ListView::new(tasklist_builder, self.tasks.len())
                 .block(Block::bordered().title_top(Line::from(" Your tasks ").centered()));
