@@ -106,6 +106,7 @@ impl<'a> Widget for TaskWidget<'a> {
 #[cfg(test)]
 mod tests {
     use super::TaskWidget;
+    use crate::Task;
 
     #[test]
     fn test_long_text() {
@@ -117,6 +118,46 @@ mod tests {
                 String::from("at should be 20+ cha"),
                 String::from("rs")
             ]
-        )
+        );
+
+        let text = TaskWidget::wrap_text(1, "TINY");
+        assert_eq!(
+            text,
+            vec![
+                String::from("T"),
+                String::from("I"),
+                String::from("N"),
+                String::from("Y"),
+            ]
+        );
+    }
+
+    #[test]
+    fn test_no_text() {
+        let text = TaskWidget::wrap_text(12, "");
+        assert_eq!(text, Vec::<String>::new());
+    }
+
+    #[test]
+    fn test_0_width() {
+        let text = TaskWidget::wrap_text(0, "OOH!");
+        assert_eq!(text, Vec::<String>::new());
+    }
+
+    #[test]
+    fn test_height() {
+        #[inline]
+        fn assert_task(title: &str, width: u16, expected_height: u16) {
+            let task = Task::new(title);
+            let real_width = width + TaskWidget::CHECKBOX_WIDTH + TaskWidget::BORDER_WIDTH;
+            let height = TaskWidget::new(&task, real_width).calc_height();
+
+            assert_eq!(height, expected_height + TaskWidget::BORDER_WIDTH);
+        }
+        assert_task("Hello", 10, 1);
+        assert_task("Hello\nnewline\nlong long long!", 10, 4);
+        assert_task("", 20, 1);
+        assert_task(":D", 0, 1);
+        assert_task("Exactly!", 8, 1);
     }
 }
