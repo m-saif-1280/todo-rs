@@ -22,7 +22,6 @@ impl App {
             terminal: ratatui::init(),
             is_running: true,
             tasks: (1..=10)
-                .into_iter()
                 .map(|n| {
                     let mut t = Task::new(&format!("Task #{n}"));
                     if n % 2 == 0 {
@@ -47,7 +46,7 @@ impl App {
             let tasklist_builder = ListBuilder::new(|context| {
                 let task = &self.tasks[context.index];
                 let task_widget =
-                    TaskWidget::new(task, context.cross_axis_size).is_focused(context.is_selected);
+                    TaskWidget::new(task, context.cross_axis_size).set_focus(context.is_selected);
                 let height = task_widget.calc_height();
 
                 (task_widget, height)
@@ -80,5 +79,11 @@ impl App {
 impl Drop for App {
     fn drop(&mut self) {
         ratatui::restore();
+    }
+}
+
+impl Default for App {
+    fn default() -> Self {
+        Self::new()
     }
 }

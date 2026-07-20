@@ -48,7 +48,7 @@ impl<'a> TaskWidget<'a> {
         }
     }
 
-    pub fn is_focused(mut self, is_focused: bool) -> Self {
+    pub fn set_focus(mut self, is_focused: bool) -> Self {
         self.is_focused = is_focused;
         self
     }
@@ -85,7 +85,7 @@ impl<'a> Widget for TaskWidget<'a> {
 
         let chunks = horizontal![==4, *=1].split(inner_area);
         let text_chunks = Layout::vertical(self.calc_widths()).split(chunks[1]);
-        let text_chunks_iter = text_chunks.into_iter();
+        let text_chunks_iter = text_chunks.iter();
 
         let text_color = if self.is_focused {
             Color::White
