@@ -1,6 +1,6 @@
 use crate::Task;
 use ratatui::{
-    macros::{constraints, span},
+    macros::{horizontal, span},
     prelude::*,
     widgets::{Block, Widget},
 };
@@ -20,7 +20,7 @@ impl<'a> Widget for TaskWidget<'a> {
 
         block.render(area, buf);
 
-        let chunks = Layout::horizontal(constraints![==4, *=1]).split(inner_area);
+        let chunks = horizontal![==4, *=1].split(inner_area);
 
         span!("[{}]", if self.task.done() { '#' } else { ' ' }).render(chunks[0], buf);
         span!(self.task.title()).render(chunks[1], buf);
