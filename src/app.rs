@@ -47,7 +47,7 @@ impl App {
             let tasklist_builder = ListBuilder::new(|context| {
                 let task = &self.tasks[context.index];
                 let task_widget =
-                    TaskWidget::new(task, context.is_selected, context.cross_axis_size);
+                    TaskWidget::new(task, context.cross_axis_size).is_focused(context.is_selected);
                 let height = task_widget.calc_height();
 
                 (task_widget, height)

@@ -30,12 +30,17 @@ impl<'a> TaskWidget<'a> {
         lines
     }
 
-    pub fn new(task: &'a Task, is_focused: bool, cross_axis_size: u16) -> Self {
+    pub fn new(task: &'a Task, width: u16) -> Self {
         Self {
             task,
-            is_focused,
-            title_lines: Self::wrap_text(cross_axis_size, task.title()),
+            is_focused: false,
+            title_lines: Self::wrap_text(width, task.title()),
         }
+    }
+
+    pub fn is_focused(mut self, is_focused: bool) -> Self {
+        self.is_focused = is_focused;
+        self
     }
 }
 
