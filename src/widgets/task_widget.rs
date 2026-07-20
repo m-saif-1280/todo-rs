@@ -102,3 +102,21 @@ impl<'a> Widget for TaskWidget<'a> {
             .for_each(|(span, chunk)| span.render(*chunk, buf));
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::TaskWidget;
+
+    #[test]
+    fn test_long_text() {
+        let text = TaskWidget::wrap_text(20, "This is some text that should be 20+ chars");
+        assert_eq!(
+            text,
+            vec![
+                String::from("This is some text th"),
+                String::from("at should be 20+ cha"),
+                String::from("rs")
+            ]
+        )
+    }
+}
