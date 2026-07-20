@@ -12,6 +12,11 @@ pub struct TaskWidget<'a> {
     title_lines: Vec<String>,
 }
 
+impl TaskWidget<'_> {
+    const CHECKBOX_WIDTH: u16 = 4;
+    const BORDER_WIDTH: u16 = 2;
+}
+
 impl<'a> TaskWidget<'a> {
     fn wrap_text(width: u16, text: &str) -> Vec<String> {
         let mut buffer = String::new();
@@ -30,11 +35,12 @@ impl<'a> TaskWidget<'a> {
         lines
     }
 
-    pub fn new(task: &'a Task, width: u16) -> Self {
+    pub fn new(task: &'a Task, listview_width: u16) -> Self {
+        let actual_width = listview_width - Self::CHECKBOX_WIDTH - Self::BORDER_WIDTH;
         Self {
             task,
             is_focused: false,
-            title_lines: Self::wrap_text(width, task.title()),
+            title_lines: Self::wrap_text(actual_width, task.title()),
         }
     }
 
