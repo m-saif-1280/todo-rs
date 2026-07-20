@@ -5,48 +5,48 @@ use ratatui::{
     style::{Color, Style},
     widgets::{Block, Widget},
 };
-use std::str::Lines;
 
 pub struct TaskWidget<'a> {
     task: &'a Task,
     is_focused: bool,
-    cross_axis_size: u16,
+    title_lines: Vec<String>,
 }
 
 impl<'a> TaskWidget<'a> {
+    fn wrap_text(width: u16, text: &str) -> Vec<String> {
+        let mut buffer = String::new();
+        let mut lines: Vec<String> = Vec::new();
+
+        for char in text.chars() {
+            if buffer.len() as u16 > width || char == '\n' {
+                lines.push(std::mem::take(&mut buffer));
+                buffer.clear();
+            }
+            buffer.push(char);
+        }
+        if !buffer.is_empty() {
+            lines.push(buffer);
+        }
+        lines
+    }
+
     pub fn new(task: &'a Task, is_focused: bool, cross_axis_size: u16) -> Self {
         Self {
             task,
             is_focused,
-            cross_axis_size,
+            title_lines: Self::wrap_text(cross_axis_size, task.title()),
         }
     }
 }
 
 impl<'a> TaskWidget<'a> {
-    #[inline]
-    fn task_lines<'b>(&'b self) -> Lines<'b> {
-        self.task.title().lines()
-    }
     pub fn calc_height(&self) -> u16 {
-        self.task_lines()
-            .map(|line| {
-                let len = line.len() as u16;
-                if len > 0 && self.cross_axis_size > 0 {
-                    len.div_ceil(self.cross_axis_size)
-                } else {
-                    1
-                }
-            })
-            .sum::<u16>()
-            + 2 /* Needed to account for the border height */
+        /* Needed to account for the border height */
+        self.title_lines.len() as u16 + 2
     }
 
-    fn calc_widths<'b>(&'b self) -> impl Iterator<Item = Constraint> + 'b {
-        self.task_lines().map(|line| {
-            let height = (line.len() as u16).div_ceil(self.cross_axis_size);
-            Constraint::Length(height)
-        })
+    fn calc_widths(&self) -> Vec<Constraint> {
+        vec![Constraint::Length(1); self.title_lines.len()]
     }
 }
 
@@ -84,7 +84,8 @@ impl<'a> Widget for TaskWidget<'a> {
 
         span!(text_color; "[{}]", if self.task.done() { '#' } else { ' ' }).render(chunks[0], buf);
 
-        self.task_lines()
+        self.title_lines
+            .into_iter()
             .map(|line| span!(text_style; line))
             .zip(text_chunks_iter)
             .for_each(|(span, chunk)| span.render(*chunk, buf));
