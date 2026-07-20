@@ -14,7 +14,7 @@ pub struct TaskWidget<'a> {
 
 impl TaskWidget<'_> {
     const CHECKBOX_WIDTH: u16 = 4;
-    const BORDER_WIDTH: u16 = 2;
+    const DUAL_BORDER_SIZE: u16 = 2;
 }
 
 impl<'a> TaskWidget<'a> {
@@ -39,7 +39,7 @@ impl<'a> TaskWidget<'a> {
     }
 
     pub fn new(task: &'a Task, listview_width: u16) -> Self {
-        let actual_width = listview_width - Self::CHECKBOX_WIDTH - Self::BORDER_WIDTH;
+        let actual_width = listview_width - Self::CHECKBOX_WIDTH - Self::DUAL_BORDER_SIZE;
         Self {
             task,
             is_focused: false,
@@ -153,10 +153,10 @@ mod tests {
         #[inline]
         fn assert_task(title: &str, width: u16, expected_height: u16) {
             let task = Task::new(title);
-            let real_width = width + TaskWidget::CHECKBOX_WIDTH + TaskWidget::BORDER_WIDTH;
+            let real_width = width + TaskWidget::CHECKBOX_WIDTH + TaskWidget::DUAL_BORDER_SIZE;
             let height = TaskWidget::new(&task, real_width).calc_height();
 
-            assert_eq!(height, expected_height + TaskWidget::BORDER_WIDTH);
+            assert_eq!(height, expected_height + TaskWidget::DUAL_BORDER_SIZE);
         }
         assert_task("Hello", 10, 1);
         assert_task("Hello\nnewline\nlong long long!", 10, 4);
