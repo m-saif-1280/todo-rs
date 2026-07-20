@@ -22,6 +22,9 @@ impl<'a> TaskWidget<'a> {
         let mut buffer = String::new();
         let mut lines: Vec<String> = Vec::new();
 
+        if width < 1 {
+            return vec![];
+        }
         for char in text.chars() {
             if buffer.len() as u16 >= width || char == '\n' {
                 lines.push(std::mem::take(&mut buffer));
