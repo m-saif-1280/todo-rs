@@ -56,7 +56,8 @@ impl<'a> TaskWidget<'a> {
 impl<'a> TaskWidget<'a> {
     pub fn calc_height(&self) -> u16 {
         /* Needed to account for the border height */
-        self.title_lines.len() as u16 + 2
+        let line_count = self.title_lines.len() as u16;
+        line_count.max(1) + 2
     }
 
     fn calc_widths(&self) -> Vec<Constraint> {
