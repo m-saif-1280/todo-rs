@@ -41,8 +41,13 @@ impl<'a> Widget for TaskWidget<'a> {
         } else {
             Color::Gray
         };
+        let text_style = if self.task.done() {
+            Style::from(text_color).crossed_out()
+        } else {
+            Style::from(text_color)
+        };
 
         span!(text_color; "[{}]", if self.task.done() { '#' } else { ' ' }).render(chunks[0], buf);
-        span!(text_color; self.task.title()).render(chunks[1], buf);
+        span!(text_style; self.task.title()).render(chunks[1], buf);
     }
 }
