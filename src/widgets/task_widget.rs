@@ -2,7 +2,7 @@ use crate::Task;
 use ratatui::{
     macros::{horizontal, span},
     prelude::*,
-    style::Color,
+    style::{Color, Style},
     widgets::{Block, Widget},
 };
 
@@ -28,11 +28,6 @@ impl<'a> Widget for TaskWidget<'a> {
                 Color::White
             } else {
                 Color::DarkGray
-            })
-            .style(if self.is_focused {
-                Color::White
-            } else {
-                Color::Gray
             });
 
         let inner_area = block.inner(area);
@@ -41,7 +36,13 @@ impl<'a> Widget for TaskWidget<'a> {
 
         let chunks = horizontal![==4, *=1].split(inner_area);
 
-        span!("[{}]", if self.task.done() { '#' } else { ' ' }).render(chunks[0], buf);
-        span!(self.task.title()).render(chunks[1], buf);
+        let text_color = if self.is_focused {
+            Color::White
+        } else {
+            Color::Gray
+        };
+
+        span!(text_color; "[{}]", if self.task.done() { '#' } else { ' ' }).render(chunks[0], buf);
+        span!(text_color; self.task.title()).render(chunks[1], buf);
     }
 }
