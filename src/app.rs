@@ -7,6 +7,7 @@ use ratatui::{DefaultTerminal, crossterm};
 use tui_widget_list::{ListBuilder, ListState, ListView};
 
 use crate::Task;
+use crate::widgets::TaskWidget;
 
 pub struct App {
     terminal: DefaultTerminal,
@@ -45,7 +46,7 @@ impl App {
         let _ = self.terminal.draw(|frame| {
             let tasklist_builder = ListBuilder::new(|context| {
                 let task = &self.tasks[context.index];
-                (task, 3)
+                (TaskWidget { task }, 3)
             });
             let list_view = ListView::new(tasklist_builder, self.tasks.len())
                 .block(Block::bordered().title_top(Line::from(" Your tasks ").centered()));
