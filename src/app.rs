@@ -46,7 +46,8 @@ impl App {
         let _ = self.terminal.draw(|frame| {
             let tasklist_builder = ListBuilder::new(|context| {
                 let task = &self.tasks[context.index];
-                (TaskWidget { task }, 3)
+
+                (TaskWidget::new(task, context.is_selected), 3)
             });
             let list_view = ListView::new(tasklist_builder, self.tasks.len())
                 .block(Block::bordered().title_top(Line::from(" Your tasks ").centered()));
@@ -62,6 +63,8 @@ impl App {
                     KeyCode::Char('c') if key.modifiers.contains(KeyModifiers::CONTROL) => {
                         self.is_running = false;
                     }
+                    KeyCode::Tab => self.tasklist_state.next(),
+                    KeyCode::BackTab => self.tasklist_state.previous(),
                     _ => {}
                 }
             }

@@ -1,9 +1,3 @@
-use ratatui::{
-    macros::{constraints, span},
-    prelude::*,
-    widgets::{Block, Widget},
-};
-
 pub struct Task {
     done: bool,
     title: String,

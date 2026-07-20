@@ -2,11 +2,19 @@ use crate::Task;
 use ratatui::{
     macros::{horizontal, span},
     prelude::*,
+    style::Color,
     widgets::{Block, Widget},
 };
 
 pub struct TaskWidget<'a> {
     pub task: &'a Task,
+    pub is_focused: bool,
+}
+
+impl<'a> TaskWidget<'a> {
+    pub fn new(task: &'a Task, is_focused: bool) -> Self {
+        Self { task, is_focused }
+    }
 }
 
 impl<'a> Widget for TaskWidget<'a> {
@@ -14,7 +22,18 @@ impl<'a> Widget for TaskWidget<'a> {
     where
         Self: Sized,
     {
-        let block = Block::bordered().border_type(ratatui::widgets::BorderType::Rounded);
+        let block = Block::bordered()
+            .border_type(ratatui::widgets::BorderType::Rounded)
+            .border_style(if self.is_focused {
+                Color::White
+            } else {
+                Color::DarkGray
+            })
+            .style(if self.is_focused {
+                Color::White
+            } else {
+                Color::Gray
+            });
 
         let inner_area = block.inner(area);
 
