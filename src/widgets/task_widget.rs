@@ -39,7 +39,8 @@ impl<'a> TaskWidget<'a> {
     }
 
     pub fn new(task: &'a Task, listview_width: u16) -> Self {
-        let actual_width = listview_width - Self::CHECKBOX_WIDTH - Self::DUAL_BORDER_SIZE;
+        let actual_width =
+            listview_width.saturating_sub(Self::CHECKBOX_WIDTH + Self::DUAL_BORDER_SIZE);
         Self {
             task,
             is_focused: false,
