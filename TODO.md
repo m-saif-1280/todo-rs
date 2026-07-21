@@ -15,11 +15,11 @@
 - [ ] **Task grouping** (by due date)
 
 ### Housekeeping
-- [ ] **CI/CD:**
-  - [ ] Automatic building
-  - [ ] Testing
-  - [ ] Code linting
-  - [ ] Github Release
+- [X] **CI/CD:**
+  - [X] Automatic building
+  - [X] Testing
+  - [X] Code linting
+  - [X] Github Release
 
 ## Task Properties
 
