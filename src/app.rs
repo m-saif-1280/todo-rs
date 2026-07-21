@@ -72,6 +72,13 @@ impl App {
                             self.tasks[idx].toggle_done();
                         }
                     }
+                    KeyCode::Delete => {
+                        if let Some(idx) = self.tasklist_state.selected
+                            && idx < self.tasks.len()
+                        {
+                            self.tasks.remove(idx);
+                        }
+                    }
                     _ => {}
                 }
             }
