@@ -8,6 +8,7 @@ license = "GPL-3.0-or-later"
 readme = "README.md"
 
 [dependencies]
+tui-input = "0.15.3"
 tui-widget-list = "0.15.3"
 
 [dependencies.ratatui]
