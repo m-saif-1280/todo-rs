@@ -77,6 +77,8 @@ impl App {
                             && idx < self.tasks.len()
                         {
                             self.tasks.remove(idx);
+                            self.tasklist_state.selected =
+                                self.tasklist_state.selected.map(|i| i.saturating_sub(1));
                         }
                     }
                     KeyCode::Char('a') => {
