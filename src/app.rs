@@ -79,6 +79,9 @@ impl App {
                             self.tasks.remove(idx);
                         }
                     }
+                    KeyCode::Char('a') => {
+                        self.tasks.push(Task::new("Hello"));
+                    }
                     _ => {}
                 }
             }
