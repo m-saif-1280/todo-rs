@@ -67,6 +67,11 @@ impl App {
                     }
                     KeyCode::Tab => self.tasklist_state.next(),
                     KeyCode::BackTab => self.tasklist_state.previous(),
+                    KeyCode::Char(' ') => {
+                        if let Some(idx) = self.tasklist_state.selected {
+                            self.tasks[idx].toggle_done();
+                        }
+                    }
                     _ => {}
                 }
             }
