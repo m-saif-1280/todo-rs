@@ -91,6 +91,10 @@ impl App {
                             self.is_adding_task = false;
                             self.adding_task_state.reset();
                         }
+                        KeyCode::Esc => {
+                            self.is_adding_task = false;
+                            self.adding_task_state.reset();
+                        }
                         _ => {
                             self.adding_task_state.handle_event(&event);
                         }
