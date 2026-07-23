@@ -27,15 +27,7 @@ impl App {
             is_adding_task: false,
             is_running: true,
             tasks: (1..=10)
-                .map(|n| {
-                    let mut t = Task::new(&format!("Task #{n}"));
-                    if n % 2 == 0 {
-                        t.toggle_done();
-                        t
-                    } else {
-                        t
-                    }
-                })
+                .map(|n| Task::new(&format!("Task #{n}")).with_done(n % 2 == 0))
                 .collect(),
             tasklist_state: ListState::default(),
         }
