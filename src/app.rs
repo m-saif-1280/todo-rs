@@ -44,27 +44,26 @@ impl App {
     }
     pub fn draw(&mut self) {
         let _ = self.terminal.draw(|frame| {
+            let tasklist_builder = ListBuilder::new(|context| {
+                let task = &self.tasks[context.index];
+                let task_widget =
+                    TaskWidget::new(task, context.cross_axis_size).set_focus(context.is_selected);
+                let height = task_widget.calc_height();
+
+                (task_widget, height)
+            });
+            let list_view = ListView::new(tasklist_builder, self.tasks.len())
+                .block(Block::bordered().title_top(Line::from(" Your tasks ").centered()));
+            frame.render_stateful_widget(list_view, frame.area(), &mut self.tasklist_state);
+
             if self.is_adding_task {
-                let scroll_width =
-                    self.adding_task_state
-                        .visual_scroll(frame.area().width as usize) as u16;
+                let width = frame.area().width as usize;
+                let scroll_width = self.adding_task_state.visual_scroll(width) as u16;
                 let widget = Paragraph::new(self.adding_task_state.value())
                     .scroll((0, scroll_width))
                     .block(Block::bordered().title_top(" Type something "));
 
                 frame.render_widget(widget, frame.area());
-            } else {
-                let tasklist_builder = ListBuilder::new(|context| {
-                    let task = &self.tasks[context.index];
-                    let task_widget = TaskWidget::new(task, context.cross_axis_size)
-                        .set_focus(context.is_selected);
-                    let height = task_widget.calc_height();
-
-                    (task_widget, height)
-                });
-                let list_view = ListView::new(tasklist_builder, self.tasks.len())
-                    .block(Block::bordered().title_top(Line::from(" Your tasks ").centered()));
-                frame.render_stateful_widget(list_view, frame.area(), &mut self.tasklist_state);
             }
         });
     }
