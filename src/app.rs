@@ -89,6 +89,7 @@ impl App {
                         KeyCode::Enter => {
                             self.tasks.push(Task::new(self.adding_task_state.value()));
                             self.is_adding_task = false;
+                            self.adding_task_state.reset();
                         }
                         _ => {
                             self.adding_task_state.handle_event(&event);
