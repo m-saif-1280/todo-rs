@@ -8,7 +8,6 @@
     - [ ] Add a widget with a label for the task input
     - [ ] Add Esc to cancel
     - [ ] Center it on top of the main screen
-  - **Task struct:** Add `with_*` methods to a task
 - [ ] **Serialization:** Make our Task struct serializable, save and load tasks from disk. Follow XDG Base directory specification.`~/.todo-rs` is not allowed.
 
 ### Could have
@@ -45,3 +44,4 @@
 - [X] Make rendering resistant to width related edge cases
 - [X] Cargo.toml metadata
 - [X] Fix clippy errors
+- [X] Add `with_*` methods to `Task` and derive `Default`

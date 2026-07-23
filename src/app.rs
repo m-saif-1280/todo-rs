@@ -27,7 +27,11 @@ impl App {
             is_adding_task: false,
             is_running: true,
             tasks: (1..=10)
-                .map(|n| Task::new(&format!("Task #{n}")).with_done(n % 2 == 0))
+                .map(|n| {
+                    Task::default()
+                        .with_title(&format!("Task #{n}"))
+                        .with_done(n % 2 == 0)
+                })
                 .collect(),
             tasklist_state: ListState::default(),
         }

@@ -1,3 +1,4 @@
+#[derive(Default)]
 pub struct Task {
     done: bool,
     title: String,
