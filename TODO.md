@@ -2,13 +2,11 @@
 
 ## Features
 
-### Critical (v0.2 + v0.3)
-- [ ] **CRUD:** Create, Update & Complete, and Delete tasks in memory. *Might require an ID system to accurately select tasks*
-  - **Input popup:**
-    - [ ] Add a widget with a label for the task input
-    - [X] Add Esc to cancel
-    - [X] Center it on top of the main screen
+### Critical (Minimum viable product)
 - [ ] **Serialization:** Make our Task struct serializable, save and load tasks from disk. Follow XDG Base directory specification.`~/.todo-rs` is not allowed.
+
+### Should Have
+- [ ] Make the add task popup not look like a void box with input labels and showing the cursor
 
 ### Could have
 - [ ] **Theme:** Make a `struct Theme { ... }` and use it to make the program look good
@@ -17,13 +15,6 @@
 - [ ] **Config:** Might include save location, keybinds, theme
 - [ ] **Undo/Redo**
 - [ ] **Task grouping** (by due date)
-
-### Housekeeping
-- [X] **CI/CD:**
-  - [X] Automatic building
-  - [X] Testing
-  - [X] Code linting
-  - [X] Github Release
 
 ## Task Properties
 
@@ -39,9 +30,11 @@
 - [ ] Category
 
 ## Done
+- [X] Create, Update & Complete, and Delete tasks in memory.
 - [X] Add tasks
 - [X] Add line wrapping
 - [X] Make rendering resistant to width related edge cases
 - [X] Cargo.toml metadata
 - [X] Fix clippy errors
 - [X] Add `with_*` methods to `Task` and derive `Default`
+- [X] **CI/CD:**
