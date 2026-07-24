@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use crossterm::event::{self, Event, KeyCode, KeyModifiers};
-use ratatui::layout::{Constraint, Layout};
+use ratatui::macros::{horizontal, vertical};
 use ratatui::text::Line;
 use ratatui::widgets::{Block, Clear, Paragraph};
 use ratatui::{DefaultTerminal, crossterm};
@@ -58,20 +58,10 @@ impl App {
             frame.render_stateful_widget(list_view, frame.area(), &mut self.tasklist_state);
 
             if self.is_adding_task {
-                let ratatui::layout::Rect {
-                    width: frame_width,
-                    height: frame_height,
-                    ..
-                } = frame.area();
-                let block_width = frame_width / 5 * 4;
-                let block_height = frame_height / 5 * 4;
-                let chunk = Layout::default()
-                    .vertical_margin((frame_height - block_height) / 2)
-                    .horizontal_margin((frame_width - block_width) / 2)
-                    .constraints([Constraint::Fill(1)])
-                    .split(frame.area());
+                let chunk = horizontal!(==10%, ==80%, ==10%).split(frame.area())[1];
+                let chunk = vertical!(==10%, ==80%, ==10%).split(chunk)[1];
                 let block = Block::bordered().title_top(" Type something ");
-                let area = block.inner(chunk[0]);
+                let area = block.inner(chunk);
 
                 let width = area.width as usize;
                 let scroll_width = self.adding_task_state.visual_scroll(width) as u16;
@@ -80,8 +70,8 @@ impl App {
                     .scroll((0, scroll_width))
                     .block(block);
 
-                frame.render_widget(Clear, area);
-                frame.render_widget(widget, area);
+                frame.render_widget(Clear, chunk);
+                frame.render_widget(widget, chunk);
             }
         });
     }
