@@ -2,7 +2,7 @@ use std::time::Duration;
 
 use crossterm::event::{self, Event, KeyCode, KeyModifiers};
 use ratatui::text::Line;
-use ratatui::widgets::{Block, Paragraph};
+use ratatui::widgets::{Block, Clear, Paragraph};
 use ratatui::{DefaultTerminal, crossterm};
 use tui_input::{Input, backend::crossterm::EventHandler};
 use tui_widget_list::{ListBuilder, ListState, ListView};
@@ -57,13 +57,18 @@ impl App {
             frame.render_stateful_widget(list_view, frame.area(), &mut self.tasklist_state);
 
             if self.is_adding_task {
-                let width = frame.area().width as usize;
+                let block = Block::bordered().title_top(" Type something ");
+                let area = block.inner(frame.area());
+
+                let width = area.width as usize;
                 let scroll_width = self.adding_task_state.visual_scroll(width) as u16;
+
                 let widget = Paragraph::new(self.adding_task_state.value())
                     .scroll((0, scroll_width))
-                    .block(Block::bordered().title_top(" Type something "));
+                    .block(block);
 
-                frame.render_widget(widget, frame.area());
+                frame.render_widget(Clear, area);
+                frame.render_widget(widget, area);
             }
         });
     }
