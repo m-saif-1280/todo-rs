@@ -6,8 +6,8 @@
 - [ ] **CRUD:** Create, Update & Complete, and Delete tasks in memory. *Might require an ID system to accurately select tasks*
   - **Input popup:**
     - [ ] Add a widget with a label for the task input
-    - [ ] Add Esc to cancel
-    - [ ] Center it on top of the main screen
+    - [X] Add Esc to cancel
+    - [X] Center it on top of the main screen
 - [ ] **Serialization:** Make our Task struct serializable, save and load tasks from disk. Follow XDG Base directory specification.`~/.todo-rs` is not allowed.
 
 ### Could have

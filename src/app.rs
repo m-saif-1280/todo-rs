@@ -1,6 +1,7 @@
 use std::time::Duration;
 
 use crossterm::event::{self, Event, KeyCode, KeyModifiers};
+use ratatui::layout::{Constraint, Layout};
 use ratatui::text::Line;
 use ratatui::widgets::{Block, Clear, Paragraph};
 use ratatui::{DefaultTerminal, crossterm};
@@ -57,8 +58,20 @@ impl App {
             frame.render_stateful_widget(list_view, frame.area(), &mut self.tasklist_state);
 
             if self.is_adding_task {
+                let ratatui::layout::Rect {
+                    width: frame_width,
+                    height: frame_height,
+                    ..
+                } = frame.area();
+                let block_width = frame_width / 5 * 4;
+                let block_height = frame_height / 5 * 4;
+                let chunk = Layout::default()
+                    .vertical_margin((frame_height - block_height) / 2)
+                    .horizontal_margin((frame_width - block_width) / 2)
+                    .constraints([Constraint::Fill(1)])
+                    .split(frame.area());
                 let block = Block::bordered().title_top(" Type something ");
-                let area = block.inner(frame.area());
+                let area = block.inner(chunk[0]);
 
                 let width = area.width as usize;
                 let scroll_width = self.adding_task_state.visual_scroll(width) as u16;
