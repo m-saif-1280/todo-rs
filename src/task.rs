@@ -1,3 +1,4 @@
+#[derive(Default)]
 pub struct Task {
     done: bool,
     title: String,
@@ -18,6 +19,15 @@ impl Task {
     }
     pub fn title(&self) -> &str {
         &self.title
+    }
+
+    pub fn with_done(mut self, done: bool) -> Self {
+        self.done = done;
+        self
+    }
+    pub fn with_title(mut self, title: &str) -> Self {
+        self.title = String::from(title);
+        self
     }
 
     pub fn toggle_done(&mut self) {

@@ -1,9 +1,11 @@
 use std::time::Duration;
 
 use crossterm::event::{self, Event, KeyCode, KeyModifiers};
+use ratatui::macros::{horizontal, vertical};
 use ratatui::text::Line;
-use ratatui::widgets::Block;
+use ratatui::widgets::{Block, Clear, Paragraph};
 use ratatui::{DefaultTerminal, crossterm};
+use tui_input::{Input, backend::crossterm::EventHandler};
 use tui_widget_list::{ListBuilder, ListState, ListView};
 
 use crate::Task;
@@ -14,22 +16,22 @@ pub struct App {
     is_running: bool,
     tasks: Vec<Task>,
     tasklist_state: ListState,
+    is_adding_task: bool,
+    adding_task_state: Input,
 }
 
 impl App {
     pub fn new() -> Self {
         Self {
+            adding_task_state: Input::default(),
             terminal: ratatui::init(),
+            is_adding_task: false,
             is_running: true,
             tasks: (1..=10)
                 .map(|n| {
-                    let mut t = Task::new(&format!("Task #{n}"));
-                    if n % 2 == 0 {
-                        t.toggle_done();
-                        t
-                    } else {
-                        t
-                    }
+                    Task::default()
+                        .with_title(&format!("Task #{n}"))
+                        .with_done(n % 2 == 0)
                 })
                 .collect(),
             tasklist_state: ListState::default(),
@@ -54,6 +56,23 @@ impl App {
             let list_view = ListView::new(tasklist_builder, self.tasks.len())
                 .block(Block::bordered().title_top(Line::from(" Your tasks ").centered()));
             frame.render_stateful_widget(list_view, frame.area(), &mut self.tasklist_state);
+
+            if self.is_adding_task {
+                let chunk = horizontal!(==10%, ==80%, ==10%).split(frame.area())[1];
+                let chunk = vertical!(==10%, ==80%, ==10%).split(chunk)[1];
+                let block = Block::bordered().title_top(" Enter task title ");
+                let area = block.inner(chunk);
+
+                let width = area.width as usize;
+                let scroll_width = self.adding_task_state.visual_scroll(width) as u16;
+
+                let widget = Paragraph::new(self.adding_task_state.value())
+                    .scroll((0, scroll_width))
+                    .block(block);
+
+                frame.render_widget(Clear, chunk);
+                frame.render_widget(widget, chunk);
+            }
         });
     }
 
@@ -61,13 +80,49 @@ impl App {
         if event::poll(Duration::from_millis(16))? {
             let event = event::read()?;
             if let Event::Key(key) = event {
-                match key.code {
-                    KeyCode::Char('c') if key.modifiers.contains(KeyModifiers::CONTROL) => {
-                        self.is_running = false;
+                if let KeyCode::Char('c') = key.code
+                    && key.modifiers.contains(KeyModifiers::CONTROL)
+                {
+                    self.is_running = false;
+                    return Ok(());
+                }
+
+                if self.is_adding_task {
+                    match key.code {
+                        KeyCode::Enter => {
+                            self.tasks.push(Task::new(self.adding_task_state.value()));
+                            self.is_adding_task = false;
+                            self.adding_task_state.reset();
+                        }
+                        KeyCode::Esc => {
+                            self.is_adding_task = false;
+                            self.adding_task_state.reset();
+                        }
+                        _ => {
+                            self.adding_task_state.handle_event(&event);
+                        }
                     }
-                    KeyCode::Tab => self.tasklist_state.next(),
-                    KeyCode::BackTab => self.tasklist_state.previous(),
-                    _ => {}
+                } else {
+                    match key.code {
+                        KeyCode::Tab => self.tasklist_state.next(),
+                        KeyCode::BackTab => self.tasklist_state.previous(),
+                        KeyCode::Char(' ') => {
+                            if let Some(idx) = self.tasklist_state.selected {
+                                self.tasks[idx].toggle_done();
+                            }
+                        }
+                        KeyCode::Delete => {
+                            if let Some(idx) = self.tasklist_state.selected
+                                && idx < self.tasks.len()
+                            {
+                                self.tasks.remove(idx);
+                                self.tasklist_state.selected =
+                                    self.tasklist_state.selected.map(|i| i.saturating_sub(1));
+                            }
+                        }
+                        KeyCode::Char('a') => self.is_adding_task = true,
+                        _ => {}
+                    }
                 }
             }
         };
