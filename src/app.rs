@@ -60,7 +60,7 @@ impl App {
             if self.is_adding_task {
                 let chunk = horizontal!(==10%, ==80%, ==10%).split(frame.area())[1];
                 let chunk = vertical!(==10%, ==80%, ==10%).split(chunk)[1];
-                let block = Block::bordered().title_top(" Type something ");
+                let block = Block::bordered().title_top(" Enter task title ");
                 let area = block.inner(chunk);
 
                 let width = area.width as usize;
