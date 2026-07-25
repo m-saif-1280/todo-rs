@@ -52,3 +52,6 @@ jobs:
         with:
           body: ${{ steps.git-cliff.outputs.content }}
           files: target/release/todo-rs
+
+      - name: Create changelog
+        run: git-cliff
