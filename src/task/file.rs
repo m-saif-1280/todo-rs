@@ -13,7 +13,7 @@ impl TaskStore {
         let path = path.as_ref();
 
         if !path.exists() {
-            return Ok(Vec::new());
+            return Err(io::Error::from(io::ErrorKind::NotFound));
         }
 
         let file = File::open(path)?;
