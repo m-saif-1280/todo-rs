@@ -9,6 +9,7 @@ use tui_input::{Input, backend::crossterm::EventHandler};
 use tui_widget_list::{ListBuilder, ListState, ListView};
 
 use crate::Task;
+use crate::TaskStore;
 use crate::widgets::TaskWidget;
 
 pub struct App {
@@ -134,6 +135,7 @@ impl App {
 impl Drop for App {
     fn drop(&mut self) {
         ratatui::restore();
+        TaskStore::save("/home/saif/.local/share/todo-rs/tasks.json", &self.tasks).unwrap();
     }
 }
 
