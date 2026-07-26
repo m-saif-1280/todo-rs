@@ -9,7 +9,9 @@ pub struct TaskStore;
 
 impl TaskStore {
     /// Load tasks from json. Returns an empty list if the file doesn't exist yet.
-    pub fn load(path: &Path) -> io::Result<Vec<Task>> {
+    pub fn load<P: AsRef<Path>>(path: P) -> io::Result<Vec<Task>> {
+        let path = path.as_ref();
+
         if !path.exists() {
             return Ok(Vec::new());
         }
@@ -25,7 +27,7 @@ impl TaskStore {
     }
 
     /// Save tasks to json file.
-    pub fn save(path: &Path, tasks: &[Task]) -> io::Result<()> {
+    pub fn save<P: AsRef<Path>>(path: P, tasks: &[Task]) -> io::Result<()> {
         let file = File::create(path)?;
         let writer = BufWriter::new(file);
 
