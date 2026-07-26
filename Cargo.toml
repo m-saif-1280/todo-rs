@@ -1,6 +1,6 @@
 [package]
 name = "todo-rs"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["m-saif-1280 <msaifrehman10@proton.me>"]
 edition = "2024"
 description = "A minimialist TUI todo app"
