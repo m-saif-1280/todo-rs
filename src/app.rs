@@ -90,6 +90,8 @@ impl App {
                 {
                     self.is_running = false;
                     return Ok(());
+                } else if let KeyCode::Char('s') = key.code {
+                    TaskStore::save(&self.tasks)?;
                 }
 
                 if self.is_adding_task {
