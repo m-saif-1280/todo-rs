@@ -2,6 +2,7 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Default, Serialize, Deserialize)]
 pub struct Task {
+    #[serde(default)]
     done: bool,
     title: String,
 }
