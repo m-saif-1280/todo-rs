@@ -28,24 +28,17 @@ impl App {
             terminal: ratatui::init(),
             is_adding_task: false,
             is_running: true,
-            tasks: TaskStore::load().unwrap_or_else(|err| {
-                use std::io::ErrorKind;
-
-                match err.kind() {
-                    ErrorKind::NotFound => Vec::new(),
-                    ErrorKind::InvalidData => {
-                        panic!("Invalid data")
-                        // TODO: Add a popup or handle it gracefully
-                    }
-                    _ => todo!("Not handling other errors right now"),
-                }
-            }),
+            tasks: Vec::new(),
             tasklist_state: ListState::default(),
         }
     }
 }
 
 impl App {
+    pub fn load_tasks(&mut self) -> std::io::Result<()> {
+        self.tasks = TaskStore::load()?;
+        Ok(())
+    }
     pub fn is_running(&self) -> bool {
         self.is_running
     }
