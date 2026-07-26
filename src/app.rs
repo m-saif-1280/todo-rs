@@ -36,7 +36,13 @@ impl App {
 
 impl App {
     pub fn load_tasks(&mut self) -> std::io::Result<()> {
-        self.tasks = TaskStore::load()?;
+        self.tasks = TaskStore::load().or_else(|err| {
+            if let std::io::ErrorKind::NotFound = err.kind() {
+                Ok(Vec::new())
+            } else {
+                Err(err)
+            }
+        })?;
         Ok(())
     }
     pub fn is_running(&self) -> bool {
