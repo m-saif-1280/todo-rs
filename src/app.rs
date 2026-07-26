@@ -28,7 +28,18 @@ impl App {
             terminal: ratatui::init(),
             is_adding_task: false,
             is_running: true,
-            tasks: TaskStore::load("/home/saif/.local/share/todo-rs/tasks.json").unwrap(),
+            tasks: TaskStore::load().unwrap_or_else(|err| {
+                use std::io::ErrorKind;
+
+                match err.kind() {
+                    ErrorKind::NotFound => Vec::new(),
+                    ErrorKind::InvalidData => {
+                        panic!("Invalid data")
+                        // TODO: Add a popup or handle it gracefully
+                    }
+                    _ => todo!("Not handling other errors right now"),
+                }
+            }),
             tasklist_state: ListState::default(),
         }
     }
@@ -129,7 +140,6 @@ impl App {
 impl Drop for App {
     fn drop(&mut self) {
         ratatui::restore();
-        TaskStore::save("/home/saif/.local/share/todo-rs/tasks.json", &self.tasks).unwrap();
     }
 }
 
