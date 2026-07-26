@@ -3,4 +3,4 @@ mod task;
 mod widgets;
 
 pub use app::App;
-pub(crate) use task::Task;
+pub use task::{Task, TaskStore};

@@ -9,6 +9,7 @@ use tui_input::{Input, backend::crossterm::EventHandler};
 use tui_widget_list::{ListBuilder, ListState, ListView};
 
 use crate::Task;
+use crate::TaskStore;
 use crate::widgets::TaskWidget;
 
 pub struct App {
@@ -27,19 +28,23 @@ impl App {
             terminal: ratatui::init(),
             is_adding_task: false,
             is_running: true,
-            tasks: (1..=10)
-                .map(|n| {
-                    Task::default()
-                        .with_title(&format!("Task #{n}"))
-                        .with_done(n % 2 == 0)
-                })
-                .collect(),
+            tasks: Vec::new(),
             tasklist_state: ListState::default(),
         }
     }
 }
 
 impl App {
+    pub fn load_tasks(&mut self) -> std::io::Result<()> {
+        self.tasks = TaskStore::load().or_else(|err| {
+            if let std::io::ErrorKind::NotFound = err.kind() {
+                Ok(Vec::new())
+            } else {
+                Err(err)
+            }
+        })?;
+        Ok(())
+    }
     pub fn is_running(&self) -> bool {
         self.is_running
     }
@@ -121,6 +126,7 @@ impl App {
                             }
                         }
                         KeyCode::Char('a') => self.is_adding_task = true,
+                        KeyCode::Char('s') => TaskStore::save(&self.tasks)?,
                         _ => {}
                     }
                 }
