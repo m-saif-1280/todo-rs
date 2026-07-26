@@ -28,13 +28,7 @@ impl App {
             terminal: ratatui::init(),
             is_adding_task: false,
             is_running: true,
-            tasks: (1..=10)
-                .map(|n| {
-                    Task::default()
-                        .with_title(&format!("Task #{n}"))
-                        .with_done(n % 2 == 0)
-                })
-                .collect(),
+            tasks: TaskStore::load("/home/saif/.local/share/todo-rs/tasks.json").unwrap(),
             tasklist_state: ListState::default(),
         }
     }
