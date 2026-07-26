@@ -1,5 +1,4 @@
 use directories::ProjectDirs;
-use serde_json;
 use std::fs::{self, File};
 use std::io::{self, BufReader, BufWriter};
 use std::path::PathBuf;
