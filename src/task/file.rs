@@ -49,12 +49,16 @@ impl TaskStore {
     /// Save tasks to json file.
     pub fn save(tasks: &[Task]) -> io::Result<()> {
         let path = Self::get_path();
+        let tmp_path = path.with_extension("tmp");
 
-        let file = File::create(path)?;
+        let file = File::create(&tmp_path)?;
         let writer = BufWriter::new(file);
 
         serde_json::to_writer(writer, tasks)
             .map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
+
+        // Rename it to the actual path
+        fs::rename(tmp_path, path)?;
 
         Ok(())
     }
