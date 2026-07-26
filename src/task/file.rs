@@ -53,8 +53,7 @@ impl TaskStore {
         let file = File::create(&tmp_path)?;
         let writer = BufWriter::new(file);
 
-        serde_json::to_writer(writer, tasks)
-            .map_err(|e| io::Error::new(io::ErrorKind::Other, e))?;
+        serde_json::to_writer(writer, tasks).map_err(io::Error::other)?;
 
         // Rename it to the actual path
         fs::rename(tmp_path, path)?;
