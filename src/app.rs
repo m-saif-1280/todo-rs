@@ -98,6 +98,7 @@ impl App {
                             self.tasks.push(Task::new(self.adding_task_state.value()));
                             self.is_adding_task = false;
                             self.adding_task_state.reset();
+                            self.save_tasks()?;
                         }
                         KeyCode::Esc => {
                             self.is_adding_task = false;
@@ -115,6 +116,7 @@ impl App {
                             if let Some(idx) = self.tasklist_state.selected {
                                 self.tasks[idx].toggle_done();
                             }
+                            self.save_tasks()?;
                         }
                         KeyCode::Delete => {
                             if let Some(idx) = self.tasklist_state.selected
@@ -124,9 +126,12 @@ impl App {
                                 self.tasklist_state.selected =
                                     self.tasklist_state.selected.map(|i| i.saturating_sub(1));
                             }
+                            self.save_tasks()?;
                         }
-                        KeyCode::Char('a') => self.is_adding_task = true,
-                        KeyCode::Char('s') => TaskStore::save(&self.tasks)?,
+                        KeyCode::Char('a') => {
+                            self.is_adding_task = true;
+                        }
+                        KeyCode::Char('s') => self.save_tasks()?,
                         _ => {}
                     }
                 }
@@ -134,6 +139,10 @@ impl App {
         };
 
         Ok(())
+    }
+    #[inline]
+    pub fn save_tasks(&self) -> std::io::Result<()> {
+        TaskStore::save(&self.tasks)
     }
 }
 
