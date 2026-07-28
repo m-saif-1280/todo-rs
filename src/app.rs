@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use crossterm::event::{self, Event, KeyCode, KeyModifiers};
-use ratatui::macros::{horizontal, vertical};
+use ratatui::macros::{horizontal, span, vertical};
 use ratatui::text::Line;
 use ratatui::widgets::{Block, Clear, Paragraph};
 use ratatui::{DefaultTerminal, crossterm};
@@ -50,6 +50,7 @@ impl App {
     }
     pub fn draw(&mut self) {
         let _ = self.terminal.draw(|frame| {
+            let master_chunks = vertical![*=1, ==1].split(frame.area());
             let tasklist_builder = ListBuilder::new(|context| {
                 let task = &self.tasks[context.index];
                 let task_widget =
@@ -60,7 +61,8 @@ impl App {
             });
             let list_view = ListView::new(tasklist_builder, self.tasks.len())
                 .block(Block::bordered().title_top(Line::from(" Your tasks ").centered()));
-            frame.render_stateful_widget(list_view, frame.area(), &mut self.tasklist_state);
+            frame.render_stateful_widget(list_view, master_chunks[0], &mut self.tasklist_state);
+            frame.render_widget(span!("Whoah!"), master_chunks[1]);
 
             if self.is_adding_task {
                 let chunk = horizontal!(==10%, ==80%, ==10%).split(frame.area())[1];
