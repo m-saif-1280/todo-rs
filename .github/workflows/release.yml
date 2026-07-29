@@ -1,0 +1,36 @@
+name: "Publish Release"
+
+on:
+  push:
+    tags: [ "v*" ]
+
+jobs:
+  main:
+    name: "Publish Release"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: "Compile"
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: "Build linux binary"
+        run: cargo build --release --locked
+
+      - name: "git-cliff"
+        id: git-cliff
+        uses: orhun/git-cliff-action@v4
+        with:
+          config: cliff.toml
+          args: -vv --latest --strip header -o -
+
+      - name: "Prepare release"
+        uses: softprops/action-gh-release@v3
+        with:
+          files: target/release/todo-rs
+          body: ${{ steps.git-cliff.outputs.content }}
