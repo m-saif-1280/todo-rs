@@ -19,6 +19,7 @@ pub struct App {
     tasklist_state: ListState,
     is_adding_task: bool,
     adding_task_state: Input,
+    save_indicator: &'static str,
 }
 
 impl App {
@@ -30,6 +31,7 @@ impl App {
             is_running: true,
             tasks: Vec::new(),
             tasklist_state: ListState::default(),
+            save_indicator: "",
         }
     }
 }
@@ -62,7 +64,7 @@ impl App {
             let list_view = ListView::new(tasklist_builder, self.tasks.len())
                 .block(Block::bordered().title_top(Line::from(" Your tasks ").centered()));
             frame.render_stateful_widget(list_view, master_chunks[0], &mut self.tasklist_state);
-            frame.render_widget(span!("Whoah!"), master_chunks[1]);
+            frame.render_widget(span!(self.save_indicator), master_chunks[1]);
 
             if self.is_adding_task {
                 let chunk = horizontal!(==10%, ==80%, ==10%).split(frame.area())[1];
@@ -86,6 +88,8 @@ impl App {
     pub fn handle_event(&mut self) -> std::io::Result<()> {
         if event::poll(Duration::from_millis(16))? {
             let event = event::read()?;
+            self.save_indicator = "";
+
             if let Event::Key(key) = event {
                 if let KeyCode::Char('c') = key.code
                     && key.modifiers.contains(KeyModifiers::CONTROL)
@@ -143,7 +147,8 @@ impl App {
         Ok(())
     }
     #[inline]
-    pub fn save_tasks(&self) -> std::io::Result<()> {
+    pub fn save_tasks(&mut self) -> std::io::Result<()> {
+        self.save_indicator = "Saved!";
         TaskStore::save(&self.tasks)
     }
 }
