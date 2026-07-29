@@ -1,7 +1,7 @@
 use std::time::Duration;
 
 use crossterm::event::{self, Event, KeyCode, KeyModifiers};
-use ratatui::macros::{horizontal, vertical};
+use ratatui::macros::{horizontal, span, vertical};
 use ratatui::text::Line;
 use ratatui::widgets::{Block, Clear, Paragraph};
 use ratatui::{DefaultTerminal, crossterm};
@@ -19,6 +19,7 @@ pub struct App {
     tasklist_state: ListState,
     is_adding_task: bool,
     adding_task_state: Input,
+    save_indicator: &'static str,
 }
 
 impl App {
@@ -30,6 +31,7 @@ impl App {
             is_running: true,
             tasks: Vec::new(),
             tasklist_state: ListState::default(),
+            save_indicator: "",
         }
     }
 }
@@ -50,6 +52,7 @@ impl App {
     }
     pub fn draw(&mut self) {
         let _ = self.terminal.draw(|frame| {
+            let master_chunks = vertical![*=1, ==1].split(frame.area());
             let tasklist_builder = ListBuilder::new(|context| {
                 let task = &self.tasks[context.index];
                 let task_widget =
@@ -60,7 +63,8 @@ impl App {
             });
             let list_view = ListView::new(tasklist_builder, self.tasks.len())
                 .block(Block::bordered().title_top(Line::from(" Your tasks ").centered()));
-            frame.render_stateful_widget(list_view, frame.area(), &mut self.tasklist_state);
+            frame.render_stateful_widget(list_view, master_chunks[0], &mut self.tasklist_state);
+            frame.render_widget(span!(self.save_indicator), master_chunks[1]);
 
             if self.is_adding_task {
                 let chunk = horizontal!(==10%, ==80%, ==10%).split(frame.area())[1];
@@ -84,6 +88,8 @@ impl App {
     pub fn handle_event(&mut self) -> std::io::Result<()> {
         if event::poll(Duration::from_millis(16))? {
             let event = event::read()?;
+            self.save_indicator = "";
+
             if let Event::Key(key) = event {
                 if let KeyCode::Char('c') = key.code
                     && key.modifiers.contains(KeyModifiers::CONTROL)
@@ -98,6 +104,7 @@ impl App {
                             self.tasks.push(Task::new(self.adding_task_state.value()));
                             self.is_adding_task = false;
                             self.adding_task_state.reset();
+                            self.save_tasks()?;
                         }
                         KeyCode::Esc => {
                             self.is_adding_task = false;
@@ -115,6 +122,7 @@ impl App {
                             if let Some(idx) = self.tasklist_state.selected {
                                 self.tasks[idx].toggle_done();
                             }
+                            self.save_tasks()?;
                         }
                         KeyCode::Delete => {
                             if let Some(idx) = self.tasklist_state.selected
@@ -124,9 +132,12 @@ impl App {
                                 self.tasklist_state.selected =
                                     self.tasklist_state.selected.map(|i| i.saturating_sub(1));
                             }
+                            self.save_tasks()?;
                         }
-                        KeyCode::Char('a') => self.is_adding_task = true,
-                        KeyCode::Char('s') => TaskStore::save(&self.tasks)?,
+                        KeyCode::Char('a') => {
+                            self.is_adding_task = true;
+                        }
+                        KeyCode::Char('s') => self.save_tasks()?,
                         _ => {}
                     }
                 }
@@ -134,6 +145,11 @@ impl App {
         };
 
         Ok(())
+    }
+    #[inline]
+    pub fn save_tasks(&mut self) -> std::io::Result<()> {
+        self.save_indicator = "Saved!";
+        TaskStore::save(&self.tasks)
     }
 }
 
