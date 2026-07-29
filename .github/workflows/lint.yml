@@ -1,0 +1,28 @@
+name: "Lint & test"
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "*" ]
+
+jobs:
+  lint:
+    name: "Lint & Test"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout"
+        uses: actions/checkout@v4
+
+      - name: "Compile"
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: "Check formatting"
+        run: cargo fmt -- --check
+
+      - name: "Clippy check 📎"
+        run: cargo clippy -- -D warnings
+
+      - name: "Run all tests"
+        run: cargo test --verbose
+      
