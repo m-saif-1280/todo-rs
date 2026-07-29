@@ -22,15 +22,15 @@ jobs:
       - name: "Build linux binary"
         run: cargo build --release --locked
 
-      - name: "git-cliff"
+      - name: "Generate release notes"
         id: git-cliff
         uses: orhun/git-cliff-action@v4
         with:
           config: cliff.toml
-          args: -vv --latest --strip header -o -
+          args: -vv --latest --strip header -o RELEASE_NOTES.md
 
       - name: "Prepare release"
         uses: softprops/action-gh-release@v3
         with:
           files: target/release/todo-rs
-          body: ${{ steps.git-cliff.outputs.content }}
+          body_path: RELEASE_NOTES.md
