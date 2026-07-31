@@ -1,5 +1,7 @@
 use serde::{Deserialize, Serialize};
 
+pub const PRIORITIES: [&'static str; 4] = ["None", "Low", "Medium", "High"];
+
 #[derive(Default, Serialize, Deserialize)]
 pub struct Task {
     title: String,
