@@ -1,4 +1,5 @@
 use crate::Task;
+
 use ratatui::{
     macros::{horizontal, span},
     prelude::*,
@@ -41,10 +42,14 @@ impl<'a> TaskWidget<'a> {
     pub fn new(task: &'a Task, listview_width: u16) -> Self {
         let actual_width =
             listview_width.saturating_sub(Self::CHECKBOX_WIDTH + Self::DUAL_BORDER_SIZE);
+        let title_lines = Self::wrap_text(
+            actual_width,
+            &format!("{}\nPriority: {}", task.title(), task.priority()),
+        );
         Self {
             task,
             is_focused: false,
-            title_lines: Self::wrap_text(actual_width, task.title()),
+            title_lines,
         }
     }
 
@@ -111,7 +116,7 @@ impl<'a> Widget for TaskWidget<'a> {
 #[cfg(test)]
 mod tests {
     use super::TaskWidget;
-    use crate::Task;
+    use crate::{Task, task::Priority};
 
     #[test]
     fn test_long_text() {
@@ -149,20 +154,34 @@ mod tests {
         assert_eq!(text, Vec::<String>::new());
     }
 
+    #[inline]
+    fn assert_task(title: &str, width: u16, expected_height: u16) {
+        let task = Task::new(title);
+        let real_width = width + TaskWidget::CHECKBOX_WIDTH + TaskWidget::DUAL_BORDER_SIZE;
+        let height = TaskWidget::new(&task, real_width).calc_height();
+
+        assert_eq!(height, expected_height + TaskWidget::DUAL_BORDER_SIZE);
+    }
+
     #[test]
     fn test_height() {
-        #[inline]
-        fn assert_task(title: &str, width: u16, expected_height: u16) {
-            let task = Task::new(title);
-            let real_width = width + TaskWidget::CHECKBOX_WIDTH + TaskWidget::DUAL_BORDER_SIZE;
-            let height = TaskWidget::new(&task, real_width).calc_height();
-
-            assert_eq!(height, expected_height + TaskWidget::DUAL_BORDER_SIZE);
-        }
-        assert_task("Hello", 10, 1);
-        assert_task("Hello\nnewline\nlong long long!", 10, 4);
-        assert_task("", 20, 1);
+        // NOTE: The priority line has 11 chars minimum ("Priority: Low")
+        // and 14 chars max ("Priority: Medium").
+        // Here, we're going with None as its the default from `Default`
+        assert_task("Hello", 10, 3);
+        assert_task("Hello\nnewline\nlong long long!", 10, 6);
+        assert_task("", 20, 2);
         assert_task(":D", 0, 1);
-        assert_task("Exactly!", 8, 1);
+        assert_task("Exactly!", 8, 3);
+    }
+
+    #[test]
+    fn test_height_with_priorities() {
+        assert_task("Hi", 10, 3); // 1 for Hi, 2 for priority as it splits on 2 lines
+        let task = Task::new("Hi").with_priority(Priority::Medium);
+        // 24 for listview, 22 for content, 20 (minus the 2char borders of the widget)
+        // and finally 4 chars removed for the checkbox leaves exactly 16
+        let widget = TaskWidget::new(&task, 24);
+        assert_eq!(widget.calc_height(), 2 + TaskWidget::DUAL_BORDER_SIZE);
     }
 }

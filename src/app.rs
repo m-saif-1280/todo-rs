@@ -10,6 +10,7 @@ use tui_widget_list::{ListBuilder, ListState, ListView};
 
 use crate::Task;
 use crate::TaskStore;
+use crate::task::Priority;
 use crate::widgets::TaskWidget;
 
 pub struct App {
@@ -138,6 +139,12 @@ impl App {
                             self.is_adding_task = true;
                         }
                         KeyCode::Char('s') => self.save_tasks()?,
+                        KeyCode::Char('p') if self.tasklist_state.selected.is_some() => {
+                            let idx = self.tasklist_state.selected.unwrap();
+                            let task = self.tasks.remove(idx);
+                            self.tasks.insert(idx, task.with_priority(Priority::High));
+                            self.save_tasks()?;
+                        }
                         _ => {}
                     }
                 }
