@@ -174,4 +174,14 @@ mod tests {
         assert_task(":D", 0, 1);
         assert_task("Exactly!", 8, 3);
     }
+
+    #[test]
+    fn test_height_with_priorities() {
+        assert_task("Hi", 10, 3); // 1 for Hi, 2 for priority as it splits on 2 lines
+        let task = Task::new("Hi").with_priority(Priority::Medium);
+        // 24 for listview, 22 for content, 20 (minus the 2char borders of the widget)
+        // and finally 4 chars removed for the checkbox leaves exactly 16
+        let widget = TaskWidget::new(&task, 24);
+        assert_eq!(widget.calc_height(), 2 + TaskWidget::DUAL_BORDER_SIZE);
+    }
 }
