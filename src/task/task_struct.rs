@@ -64,6 +64,20 @@ impl Task {
 
 impl Display for Task {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}\nPriority: {}", self.title, self.priority)
+        write!(
+            f,
+            "{}\nPriority: {}{}",
+            self.title,
+            self.priority,
+            self.due_date
+                .map(|date| {
+                    let fmt = time::format_description::parse_owned::<3>(
+                        "[weekday], [month repr:long] [day], [year] at [hour repr:12]:[minute] [period]",
+                    )
+                    .unwrap();
+                    format!("\nDue by: {}", date.format(&fmt).unwrap())
+                })
+                .unwrap_or_default()
+        )
     }
 }
