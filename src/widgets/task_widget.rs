@@ -42,10 +42,7 @@ impl<'a> TaskWidget<'a> {
     pub fn new(task: &'a Task, listview_width: u16) -> Self {
         let actual_width =
             listview_width.saturating_sub(Self::CHECKBOX_WIDTH + Self::DUAL_BORDER_SIZE);
-        let title_lines = Self::wrap_text(
-            actual_width,
-            &format!("{}\nPriority: {}", task.title(), task.priority()),
-        );
+        let title_lines = Self::wrap_text(actual_width, &format!("{task}"));
         Self {
             task,
             is_focused: false,
