@@ -1,0 +1,83 @@
+name: 🐛 Bug report
+description: Report a bug
+labels: [bug]
+body:
+  - type: textarea
+    id: bug-description
+    attributes:
+      label: Description
+      description: Describe the bug in detail
+      placeholder: Include the expected AND the actual behaviour
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps to Reproduce the Problem
+      description: How can we trigger this?
+      placeholder: "1. Run...\n2. Press...\n3. See error..."
+    validations:
+      required: true
+
+  - type: input
+    id: program-version
+    attributes:
+      label: Program Version
+      description: What version are you running? (e.g., v0.3.0)
+    validations:
+      required: true
+
+  - type: input
+    id: platform
+    attributes:
+      label: Platform
+      description: Run uname -a on Linux or provide Windows version + architecture
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: How bad is it?
+      options:
+        - Critical (App crashes / data loss), e.g. "The app refuses to load my tasks"
+        - Major (Feature broken, no workaround), e.g. "I can't edit tasks anymore"
+        - Minor (Annoying, but workable), e.g. "The colors for the priorities aren't right"
+        - Nitpick (UI polish / typo), e.g. "If i press this button 27 times in 6.41 seconds the app crashes"
+    validations:
+      required: true
+
+  - type: textarea
+    id: workaround
+    attributes:
+      label: Current Workarounds
+      description: Any ways to avoid this bug?
+      placeholder: Restarting the terminal / none
+    validations:
+      required: true
+
+  - type: textarea
+    id: media
+    attributes:
+      label: Screenshot or Video
+      description: Slap any visual proof here
+      placeholder: Paste, drop, or click to add files
+
+  - type: textarea
+    id: other-details
+    attributes:
+      label: Other details
+      placeholder: Additional context or attachments.
+
+  - type: checkboxes
+    id: acknowledgements
+    attributes:
+      label: "I acknowledge that:"
+      description: Your issue will be closed if you haven't done these.
+      options:
+        - label: I have created a new issue that is NOT already open
+          required: true
+        - label: I have made sure that this isn't already fixed in a newer version
+          required: true
