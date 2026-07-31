@@ -116,7 +116,7 @@ impl<'a> Widget for TaskWidget<'a> {
 #[cfg(test)]
 mod tests {
     use super::TaskWidget;
-    use crate::Task;
+    use crate::{Task, task::Priority};
 
     #[test]
     fn test_long_text() {
@@ -154,20 +154,24 @@ mod tests {
         assert_eq!(text, Vec::<String>::new());
     }
 
+    #[inline]
+    fn assert_task(title: &str, width: u16, expected_height: u16) {
+        let task = Task::new(title);
+        let real_width = width + TaskWidget::CHECKBOX_WIDTH + TaskWidget::DUAL_BORDER_SIZE;
+        let height = TaskWidget::new(&task, real_width).calc_height();
+
+        assert_eq!(height, expected_height + TaskWidget::DUAL_BORDER_SIZE);
+    }
+
     #[test]
     fn test_height() {
-        #[inline]
-        fn assert_task(title: &str, width: u16, expected_height: u16) {
-            let task = Task::new(title);
-            let real_width = width + TaskWidget::CHECKBOX_WIDTH + TaskWidget::DUAL_BORDER_SIZE;
-            let height = TaskWidget::new(&task, real_width).calc_height();
-
-            assert_eq!(height, expected_height + TaskWidget::DUAL_BORDER_SIZE);
-        }
-        assert_task("Hello", 10, 1);
-        assert_task("Hello\nnewline\nlong long long!", 10, 4);
-        assert_task("", 20, 1);
+        // NOTE: The priority line has 11 chars minimum ("Priority: Low")
+        // and 14 chars max ("Priority: Medium").
+        // Here, we're going with None as its the default from `Default`
+        assert_task("Hello", 10, 3);
+        assert_task("Hello\nnewline\nlong long long!", 10, 6);
+        assert_task("", 20, 2);
         assert_task(":D", 0, 1);
-        assert_task("Exactly!", 8, 1);
+        assert_task("Exactly!", 8, 3);
     }
 }
