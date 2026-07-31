@@ -1,0 +1,31 @@
+name: ⭐ Feature request
+description: Suggest a feature
+labels: [feature]
+body:
+
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: Description
+      description: Describe the feature you'd like to see added
+      placeholder: How should your new feature work? Describe it here.
+    validations:
+      required: true
+
+  - type: textarea
+    id: other-details
+    attributes:
+      label: Other details
+      placeholder: Additional details and attachments.
+
+  - type: checkboxes
+    id: acknowledgements
+    attributes:
+      label: "I acknowledge that:"
+      description: Your issue will be closed if you haven't done these.
+      options:
+        - label: I have created a new issue that is NOT already open
+          required: true
+
+        - label: I have made sure that this isn't already implemented
+          required: true
