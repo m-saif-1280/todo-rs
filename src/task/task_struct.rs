@@ -2,6 +2,7 @@ use std::fmt::Display;
 
 use super::Priority;
 use serde::{Deserialize, Serialize};
+use time::OffsetDateTime;
 
 #[derive(Default, Serialize, Deserialize)]
 pub struct Task {
@@ -10,6 +11,8 @@ pub struct Task {
     done: bool,
     #[serde(default)]
     priority: Priority,
+    #[serde(default)]
+    due_date: Option<OffsetDateTime>,
 }
 
 impl Task {
@@ -18,6 +21,7 @@ impl Task {
             done: false,
             title: String::from(title),
             priority: Priority::default(),
+            due_date: None,
         }
     }
 }
@@ -32,6 +36,9 @@ impl Task {
     pub fn priority(&self) -> Priority {
         self.priority
     }
+    pub fn due_date(&self) -> Option<OffsetDateTime> {
+        self.due_date
+    }
 
     pub fn with_done(mut self, done: bool) -> Self {
         self.done = done;
@@ -43,6 +50,10 @@ impl Task {
     }
     pub fn with_priority(mut self, priority: Priority) -> Self {
         self.priority = priority;
+        self
+    }
+    pub fn with_due_date(mut self, due_date: Option<OffsetDateTime>) -> Self {
+        self.due_date = due_date;
         self
     }
 
