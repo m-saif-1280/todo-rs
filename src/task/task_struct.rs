@@ -21,7 +21,7 @@ impl Task {
             done: false,
             title: String::from(title),
             priority: Priority::default(),
-            due_date: None,
+            due_date: Some(OffsetDateTime::now_utc()),
         }
     }
 }
