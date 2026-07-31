@@ -2,9 +2,11 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Default, Serialize, Deserialize)]
 pub struct Task {
+    title: String,
     #[serde(default)]
     done: bool,
-    title: String,
+    #[serde(default)]
+    priority: u8,
 }
 
 impl Task {
@@ -12,6 +14,7 @@ impl Task {
         Self {
             done: false,
             title: String::from(title),
+            priority: 0,
         }
     }
 }
@@ -23,6 +26,9 @@ impl Task {
     pub fn title(&self) -> &str {
         &self.title
     }
+    pub fn priority(&self) -> u8 {
+        self.priority
+    }
 
     pub fn with_done(mut self, done: bool) -> Self {
         self.done = done;
@@ -30,6 +36,10 @@ impl Task {
     }
     pub fn with_title(mut self, title: &str) -> Self {
         self.title = String::from(title);
+        self
+    }
+    pub fn with_priority(mut self, priority: u8) -> Self {
+        self.priority = priority;
         self
     }
 
