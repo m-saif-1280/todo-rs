@@ -1,6 +1,5 @@
+use super::Priority;
 use serde::{Deserialize, Serialize};
-
-pub const PRIORITIES: [&'static str; 4] = ["None", "Low", "Medium", "High"];
 
 #[derive(Default, Serialize, Deserialize)]
 pub struct Task {
@@ -8,7 +7,7 @@ pub struct Task {
     #[serde(default)]
     done: bool,
     #[serde(default)]
-    priority: u8,
+    priority: Priority,
 }
 
 impl Task {
@@ -16,7 +15,7 @@ impl Task {
         Self {
             done: false,
             title: String::from(title),
-            priority: 0,
+            priority: Priority::default(),
         }
     }
 }
@@ -28,7 +27,7 @@ impl Task {
     pub fn title(&self) -> &str {
         &self.title
     }
-    pub fn priority(&self) -> u8 {
+    pub fn priority(&self) -> Priority {
         self.priority
     }
 
@@ -40,7 +39,7 @@ impl Task {
         self.title = String::from(title);
         self
     }
-    pub fn with_priority(mut self, priority: u8) -> Self {
+    pub fn with_priority(mut self, priority: Priority) -> Self {
         self.priority = priority;
         self
     }
