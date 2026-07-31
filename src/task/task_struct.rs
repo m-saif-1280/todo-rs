@@ -1,3 +1,5 @@
+use std::fmt::Display;
+
 use super::Priority;
 use serde::{Deserialize, Serialize};
 
@@ -46,5 +48,11 @@ impl Task {
 
     pub fn toggle_done(&mut self) {
         self.done = !self.done
+    }
+}
+
+impl Display for Task {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "{}\nPriority: {}", self.title, self.priority)
     }
 }
