@@ -153,7 +153,7 @@ mod tests {
 
     #[inline]
     fn assert_task(title: &str, width: u16, expected_height: u16) {
-        let task = Task::new(title);
+        let task = Task::new(title).with_due_date(None);
         let real_width = width + TaskWidget::CHECKBOX_WIDTH + TaskWidget::DUAL_BORDER_SIZE;
         let height = TaskWidget::new(&task, real_width).calc_height();
 
@@ -175,7 +175,9 @@ mod tests {
     #[test]
     fn test_height_with_priorities() {
         assert_task("Hi", 10, 3); // 1 for Hi, 2 for priority as it splits on 2 lines
-        let task = Task::new("Hi").with_priority(Priority::Medium);
+        let task = Task::new("Hi")
+            .with_priority(Priority::Medium)
+            .with_due_date(None);
         // 24 for listview, 22 for content, 20 (minus the 2char borders of the widget)
         // and finally 4 chars removed for the checkbox leaves exactly 16
         let widget = TaskWidget::new(&task, 24);
