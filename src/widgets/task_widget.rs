@@ -112,6 +112,8 @@ impl<'a> Widget for TaskWidget<'a> {
 
 #[cfg(test)]
 mod tests {
+    use time::{Date, Time};
+
     use super::TaskWidget;
     use crate::{Task, task::Priority};
 
@@ -182,5 +184,28 @@ mod tests {
         // and finally 4 chars removed for the checkbox leaves exactly 16
         let widget = TaskWidget::new(&task, 24);
         assert_eq!(widget.calc_height(), 2 + TaskWidget::DUAL_BORDER_SIZE);
+    }
+
+    #[test]
+    fn test_height_with_due_date() {
+        // Due by: Saturday, August 01, 2026 at 07:45 AM
+        // exactly 45 characters long
+
+        // pair that with the listview borders (+2), the checkbox (+4)
+        // the borders of the task itself (+2), you get 53
+        let task = Task::new("Hi")
+            .with_priority(Priority::High)
+            .with_due_date(Some(time::OffsetDateTime::new_utc(
+                Date::from_calendar_date(2026, time::Month::August, 1).unwrap(),
+                Time::from_hms(7, 45, 0).unwrap(),
+            )));
+        let widget = TaskWidget::new(&task, 52);
+
+        // 1 for the title, 1 for the priority and 1 for the due date
+        assert_eq!(widget.calc_height(), 3 + TaskWidget::DUAL_BORDER_SIZE);
+
+        // Same as above ut one tiny character shorter
+        let widget2 = TaskWidget::new(&task, 51);
+        assert_eq!(widget2.calc_height(), 4 + TaskWidget::DUAL_BORDER_SIZE);
     }
 }
