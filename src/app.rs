@@ -10,7 +10,6 @@ use tui_widget_list::{ListBuilder, ListState, ListView};
 
 use crate::Task;
 use crate::TaskStore;
-use crate::task::Priority;
 use crate::widgets::TaskWidget;
 
 pub struct App {
