@@ -10,6 +10,17 @@ pub enum Priority {
     High,
 }
 
+impl Priority {
+    pub fn next(&mut self) -> Self {
+        match self {
+            Self::None => Self::Low,
+            Self::Low => Self::Medium,
+            Self::Medium => Self::High,
+            Self::High => Self::None,
+        }
+    }
+}
+
 impl Display for Priority {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
