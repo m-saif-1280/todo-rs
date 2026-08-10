@@ -142,7 +142,8 @@ impl App {
                         KeyCode::Char('p') if self.tasklist_state.selected.is_some() => {
                             let idx = self.tasklist_state.selected.unwrap();
                             let task = self.tasks.remove(idx);
-                            self.tasks.insert(idx, task.with_priority(Priority::High));
+                            let new_priority = task.priority().next();
+                            self.tasks.insert(idx, task.with_priority(new_priority));
                             self.save_tasks()?;
                         }
                         _ => {}
