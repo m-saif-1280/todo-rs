@@ -10,6 +10,7 @@ use tui_widget_list::{ListBuilder, ListState, ListView};
 
 use crate::Task;
 use crate::TaskStore;
+use crate::screens::{AddTaskScreen, AddTaskScreenState};
 use crate::widgets::TaskWidget;
 
 pub struct App {
@@ -18,14 +19,14 @@ pub struct App {
     tasks: Vec<Task>,
     tasklist_state: ListState,
     is_adding_task: bool,
-    adding_task_state: Input,
+    adding_task_state: AddTaskScreenState,
     save_indicator: &'static str,
 }
 
 impl App {
     pub fn new() -> Self {
         Self {
-            adding_task_state: Input::default(),
+            adding_task_state: AddTaskScreenState::default(),
             terminal: ratatui::init(),
             is_adding_task: false,
             is_running: true,
@@ -67,20 +68,11 @@ impl App {
             frame.render_widget(span!(self.save_indicator), master_chunks[1]);
 
             if self.is_adding_task {
-                let chunk = horizontal!(==10%, ==80%, ==10%).split(frame.area())[1];
-                let chunk = vertical!(==10%, ==80%, ==10%).split(chunk)[1];
-                let block = Block::bordered().title_top(" Enter task title ");
-                let area = block.inner(chunk);
-
-                let width = area.width as usize;
-                let scroll_width = self.adding_task_state.visual_scroll(width) as u16;
-
-                let widget = Paragraph::new(self.adding_task_state.value())
-                    .scroll((0, scroll_width))
-                    .block(block);
-
-                frame.render_widget(Clear, chunk);
-                frame.render_widget(widget, chunk);
+                frame.render_stateful_widget(
+                    AddTaskScreen,
+                    frame.area(),
+                    &mut self.adding_task_state,
+                );
             }
         });
     }
