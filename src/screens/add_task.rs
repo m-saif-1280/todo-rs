@@ -62,7 +62,7 @@ impl HandleEvent for AddTaskScreenState {
                     AppAction::ToMain
                 }
                 _ => {
-                    self.title_input_state.handle_event(&event);
+                    self.title_input_state.handle_event(event);
                     AppAction::None
                 }
             }
