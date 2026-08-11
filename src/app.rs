@@ -98,32 +98,8 @@ impl App {
                         }
                     }
                 } else {
-                    match self.tasklist_state.handle_event(&event) {
-                        AppAction::RequestAddTask => self.is_adding_task = true,
-                        AppAction::Task(t) => match t {
-                            TaskAction::Create(task) => {
-                                self.tasks.push(task);
-                                self.save_tasks()?
-                            }
-                            TaskAction::ToggleDone(idx) => {
-                                self.tasks[idx].toggle_done();
-                                self.save_tasks()?
-                            }
-                            TaskAction::Delete(idx) => {
-                                self.tasks.remove(idx);
-                                self.save_tasks()?
-                            }
-                            TaskAction::Save => self.save_tasks()?,
-                            TaskAction::NextPriority(idx) => {
-                                let t = self.tasks.remove(idx);
-                                let new_priority = t.priority().next();
-                                self.tasks.insert(idx, t.with_priority(new_priority));
-                                self.save_tasks()?
-                            }
-                            _ => {}
-                        },
-                        AppAction::None => {}
-                    }
+                    let action = self.tasklist_state.handle_event(&event);
+                    self.handle_screen_event(action)?
                 }
             }
         };
@@ -134,6 +110,37 @@ impl App {
     pub fn save_tasks(&mut self) -> std::io::Result<()> {
         self.save_indicator = "Saved!";
         TaskStore::save(&self.tasks)
+    }
+
+    fn handle_screen_event(&mut self, action: AppAction) -> std::io::Result<()> {
+        match action {
+            AppAction::RequestAddTask => self.is_adding_task = true,
+            AppAction::Task(t) => match t {
+                TaskAction::Create(task) => {
+                    self.tasks.push(task);
+                    self.save_tasks()?
+                }
+                TaskAction::ToggleDone(idx) => {
+                    self.tasks[idx].toggle_done();
+                    self.save_tasks()?
+                }
+                TaskAction::Delete(idx) => {
+                    self.tasks.remove(idx);
+                    self.save_tasks()?
+                }
+                TaskAction::Save => self.save_tasks()?,
+                TaskAction::NextPriority(idx) => {
+                    let t = self.tasks.remove(idx);
+                    let new_priority = t.priority().next();
+                    self.tasks.insert(idx, t.with_priority(new_priority));
+                    self.save_tasks()?
+                }
+                _ => {}
+            },
+            AppAction::None => {}
+        };
+
+        Ok(())
     }
 }
 
