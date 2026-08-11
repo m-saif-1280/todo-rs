@@ -1,6 +1,7 @@
 pub enum AppAction {
     None,
     RequestAddTask,
+    ToMain,
     Task(TaskAction),
 }
 

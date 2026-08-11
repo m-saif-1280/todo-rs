@@ -138,6 +138,7 @@ impl App {
                 _ => {}
             },
             AppAction::None => {}
+            AppAction::ToMain => self.is_adding_task = false,
         };
 
         Ok(())
