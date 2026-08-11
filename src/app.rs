@@ -82,21 +82,8 @@ impl App {
                 }
 
                 if self.is_adding_task {
-                    match key.code {
-                        KeyCode::Enter => {
-                            self.tasks.push(Task::new(self.adding_task_state.value()));
-                            self.is_adding_task = false;
-                            self.adding_task_state.reset();
-                            self.save_tasks()?;
-                        }
-                        KeyCode::Esc => {
-                            self.is_adding_task = false;
-                            self.adding_task_state.reset();
-                        }
-                        _ => {
-                            self.adding_task_state.handle_event(&event);
-                        }
-                    }
+                    let action: AppAction = self.adding_task_state.handle_event(&event);
+                    self.handle_screen_event(action)?
                 } else {
                     let action = self.tasklist_state.handle_event(&event);
                     self.handle_screen_event(action)?
@@ -118,6 +105,7 @@ impl App {
             AppAction::Task(t) => match t {
                 TaskAction::Create(task) => {
                     self.tasks.push(task);
+                    self.is_adding_task = false;
                     self.save_tasks()?
                 }
                 TaskAction::ToggleDone(idx) => {

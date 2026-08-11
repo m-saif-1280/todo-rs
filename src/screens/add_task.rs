@@ -1,10 +1,13 @@
 use ratatui::{
-    crossterm::event::Event,
+    crossterm::event::{Event, KeyCode},
     macros::{horizontal, vertical},
     prelude::{Buffer, Rect, StatefulWidget},
     widgets::{Block, Clear, Paragraph, Widget},
 };
 use tui_input::{Input, backend::crossterm::EventHandler};
+
+use super::{AppAction, HandleEvent, TaskAction};
+use crate::Task;
 
 pub struct AddTaskScreen;
 
@@ -41,7 +44,30 @@ impl AddTaskScreenState {
     pub fn reset(&mut self) {
         self.title_input_state.reset();
     }
-    pub fn handle_event(&mut self, evt: &Event) {
-        self.title_input_state.handle_event(evt);
+}
+
+impl HandleEvent for AddTaskScreenState {
+    fn handle_event(&mut self, event: &Event) -> AppAction {
+        if let Event::Key(key) = event {
+            match key.code {
+                KeyCode::Enter => {
+                    let action = AppAction::Task(TaskAction::Create(Task::new(
+                        self.title_input_state.value(),
+                    )));
+                    self.title_input_state.reset();
+                    action
+                }
+                KeyCode::Esc => {
+                    self.title_input_state.reset();
+                    AppAction::ToMain
+                }
+                _ => {
+                    self.title_input_state.handle_event(&event);
+                    AppAction::None
+                }
+            }
+        } else {
+            AppAction::None
+        }
     }
 }
