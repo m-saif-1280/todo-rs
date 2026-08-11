@@ -17,7 +17,7 @@ pub enum TaskAction {
 ///
 /// This trait is meant to be put on the state variable
 /// of a stateful widget
-pub(super) trait HandleEvent {
+pub trait HandleEvent {
     /// Take an event and handle it, returning an action for the app to do
     fn handle_event(&mut self, event: &ratatui::crossterm::event::Event) -> AppAction;
 }
