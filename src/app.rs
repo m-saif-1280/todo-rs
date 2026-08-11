@@ -118,28 +118,22 @@ impl App {
                     match key.code {
                         KeyCode::Tab => self.tasklist_state.next(),
                         KeyCode::BackTab => self.tasklist_state.previous(),
-                        KeyCode::Char(' ') => {
-                            if let Some(idx) = self.tasklist_state.selected {
-                                self.tasks[idx].toggle_done();
-                            }
+                        KeyCode::Char(' ') if let Some(idx) = self.tasklist_state.selected => {
+                            self.tasks[idx].toggle_done();
                             self.save_tasks()?;
                         }
-                        KeyCode::Delete => {
+                        KeyCode::Delete
                             if let Some(idx) = self.tasklist_state.selected
-                                && idx < self.tasks.len()
-                            {
-                                self.tasks.remove(idx);
-                                self.tasklist_state.selected =
-                                    self.tasklist_state.selected.map(|i| i.saturating_sub(1));
-                            }
+                                && idx < self.tasks.len() =>
+                        {
+                            self.tasks.remove(idx);
+                            self.tasklist_state.selected =
+                                self.tasklist_state.selected.map(|i| i.saturating_sub(1));
                             self.save_tasks()?;
                         }
-                        KeyCode::Char('a') => {
-                            self.is_adding_task = true;
-                        }
+                        KeyCode::Char('a') => self.is_adding_task = true,
                         KeyCode::Char('s') => self.save_tasks()?,
-                        KeyCode::Char('p') if self.tasklist_state.selected.is_some() => {
-                            let idx = self.tasklist_state.selected.unwrap();
+                        KeyCode::Char('p') if let Some(idx) = self.tasklist_state.selected => {
                             let task = self.tasks.remove(idx);
                             let new_priority = task.priority().next();
                             self.tasks.insert(idx, task.with_priority(new_priority));
