@@ -50,13 +50,17 @@ impl App {
     }
     pub fn draw(&mut self) {
         let _ = self.terminal.draw(|frame| {
-            let master_chunks = vertical![*=1, ==1].split(frame.area());
+            let [task_screen_chunk, save_indicator_chunk] =
+                *vertical![*=1, ==1].split(frame.area())
+            else {
+                return;
+            };
             frame.render_stateful_widget(
                 TaskScreen { tasks: &self.tasks },
-                master_chunks[0],
+                task_screen_chunk,
                 &mut self.tasklist_state,
             );
-            frame.render_widget(span!(self.save_indicator), master_chunks[1]);
+            frame.render_widget(span!(self.save_indicator), save_indicator_chunk);
 
             if self.is_adding_task {
                 frame.render_stateful_widget(
