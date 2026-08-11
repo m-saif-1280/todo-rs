@@ -1,3 +1,4 @@
+mod actions;
 mod add_task;
 mod task_list;
 
