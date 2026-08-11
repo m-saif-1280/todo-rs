@@ -10,12 +10,7 @@ pub enum TaskAction {
     Delete(usize),
     Save,
     ToggleDone(usize),
-}
-
-impl AppAction {
-    pub fn task(task: TaskAction) -> Self {
-        Self::Task(task)
-    }
+    NextPriority(usize),
 }
 
 /// A trait for handling events

@@ -75,10 +75,7 @@ impl HandleEvent for TaskScreenState {
                 KeyCode::Char('a') => AppAction::RequestAddTask,
                 KeyCode::Char('s') => AppAction::Task(TaskAction::Save),
                 KeyCode::Char('p') if let Some(idx) = self.selected() => {
-                    let task = self.tasks.remove(idx);
-                    let new_priority = task.priority().next();
-
-                    AppAction::Task(TaskAction::Amend { idx, new: task })
+                    AppAction::Task(TaskAction::NextPriority(idx))
                 }
                 _ => AppAction::None,
             }
