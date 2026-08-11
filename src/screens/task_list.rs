@@ -1,10 +1,12 @@
 use ratatui::{
+    crossterm::event::{Event, KeyCode},
     prelude::{Buffer, Rect, StatefulWidget},
     text::Line,
     widgets::Block,
 };
 use tui_widget_list::{ListBuilder, ListState, ListView};
 
+use super::{AppAction, HandleEvent, TaskAction};
 use crate::Task;
 use crate::widgets::TaskWidget;
 
@@ -48,5 +50,40 @@ impl TaskScreenState {
     }
     pub fn deselect(&mut self) {
         self.tasklist_state.selected.take();
+    }
+}
+
+impl HandleEvent for TaskScreenState {
+    fn handle_event(&mut self, event: &Event) -> AppAction {
+        if let Event::Key(key) = event {
+            match key.code {
+                KeyCode::Tab => {
+                    self.next();
+                    AppAction::None
+                }
+                KeyCode::BackTab => {
+                    self.previous();
+                    AppAction::None
+                }
+                KeyCode::Char(' ') if let Some(idx) = self.selected() => {
+                    AppAction::Task(TaskAction::ToggleDone(idx))
+                }
+                KeyCode::Delete if let Some(idx) = self.selected() => {
+                    self.deselect();
+                    AppAction::Task(TaskAction::Delete(idx))
+                }
+                KeyCode::Char('a') => AppAction::RequestAddTask,
+                KeyCode::Char('s') => AppAction::Task(TaskAction::Save),
+                KeyCode::Char('p') if let Some(idx) = self.selected() => {
+                    let task = self.tasks.remove(idx);
+                    let new_priority = task.priority().next();
+
+                    AppAction::Task(TaskAction::Amend { idx, new: task })
+                }
+                _ => AppAction::None,
+            }
+        } else {
+            AppAction::None
+        }
     }
 }
