@@ -1,23 +1,19 @@
 use std::time::Duration;
 
 use crossterm::event::{self, Event, KeyCode, KeyModifiers};
-use ratatui::macros::{horizontal, span, vertical};
-use ratatui::text::Line;
-use ratatui::widgets::{Block, Clear, Paragraph};
+use ratatui::macros::{span, vertical};
 use ratatui::{DefaultTerminal, crossterm};
-use tui_input::{Input, backend::crossterm::EventHandler};
-use tui_widget_list::{ListBuilder, ListState, ListView};
 
 use crate::Task;
 use crate::TaskStore;
 use crate::screens::{AddTaskScreen, AddTaskScreenState};
-use crate::widgets::TaskWidget;
+use crate::screens::{TaskScreen, TaskScreenState};
 
 pub struct App {
     terminal: DefaultTerminal,
     is_running: bool,
     tasks: Vec<Task>,
-    tasklist_state: ListState,
+    tasklist_state: TaskScreenState,
     is_adding_task: bool,
     adding_task_state: AddTaskScreenState,
     save_indicator: &'static str,
@@ -31,7 +27,7 @@ impl App {
             is_adding_task: false,
             is_running: true,
             tasks: Vec::new(),
-            tasklist_state: ListState::default(),
+            tasklist_state: TaskScreenState::default(),
             save_indicator: "",
         }
     }
@@ -54,17 +50,11 @@ impl App {
     pub fn draw(&mut self) {
         let _ = self.terminal.draw(|frame| {
             let master_chunks = vertical![*=1, ==1].split(frame.area());
-            let tasklist_builder = ListBuilder::new(|context| {
-                let task = &self.tasks[context.index];
-                let task_widget =
-                    TaskWidget::new(task, context.cross_axis_size).set_focus(context.is_selected);
-                let height = task_widget.calc_height();
-
-                (task_widget, height)
-            });
-            let list_view = ListView::new(tasklist_builder, self.tasks.len())
-                .block(Block::bordered().title_top(Line::from(" Your tasks ").centered()));
-            frame.render_stateful_widget(list_view, master_chunks[0], &mut self.tasklist_state);
+            frame.render_stateful_widget(
+                TaskScreen { tasks: &self.tasks },
+                master_chunks[0],
+                &mut self.tasklist_state,
+            );
             frame.render_widget(span!(self.save_indicator), master_chunks[1]);
 
             if self.is_adding_task {
@@ -111,18 +101,17 @@ impl App {
                         KeyCode::Tab => self.tasklist_state.next(),
                         KeyCode::BackTab => self.tasklist_state.previous(),
                         KeyCode::Char(' ') => {
-                            if let Some(idx) = self.tasklist_state.selected {
+                            if let Some(idx) = self.tasklist_state.selected() {
                                 self.tasks[idx].toggle_done();
                             }
                             self.save_tasks()?;
                         }
                         KeyCode::Delete => {
-                            if let Some(idx) = self.tasklist_state.selected
+                            if let Some(idx) = self.tasklist_state.selected()
                                 && idx < self.tasks.len()
                             {
                                 self.tasks.remove(idx);
-                                self.tasklist_state.selected =
-                                    self.tasklist_state.selected.map(|i| i.saturating_sub(1));
+                                self.tasklist_state.deselect();
                             }
                             self.save_tasks()?;
                         }
@@ -130,8 +119,8 @@ impl App {
                             self.is_adding_task = true;
                         }
                         KeyCode::Char('s') => self.save_tasks()?,
-                        KeyCode::Char('p') if self.tasklist_state.selected.is_some() => {
-                            let idx = self.tasklist_state.selected.unwrap();
+                        KeyCode::Char('p') if self.tasklist_state.selected().is_some() => {
+                            let idx = self.tasklist_state.selected().unwrap();
                             let task = self.tasks.remove(idx);
                             let new_priority = task.priority().next();
                             self.tasks.insert(idx, task.with_priority(new_priority));
