@@ -7,6 +7,7 @@ use ratatui::{DefaultTerminal, crossterm};
 use crate::Task;
 use crate::TaskStore;
 use crate::screens::{AddTaskScreen, AddTaskScreenState};
+use crate::screens::{AppAction, HandleEvent, TaskAction};
 use crate::screens::{TaskScreen, TaskScreenState};
 
 pub struct App {
@@ -97,36 +98,31 @@ impl App {
                         }
                     }
                 } else {
-                    match key.code {
-                        KeyCode::Tab => self.tasklist_state.next(),
-                        KeyCode::BackTab => self.tasklist_state.previous(),
-                        KeyCode::Char(' ') => {
-                            if let Some(idx) = self.tasklist_state.selected() {
+                    match self.tasklist_state.handle_event(&event) {
+                        AppAction::RequestAddTask => self.is_adding_task = true,
+                        AppAction::Task(t) => match t {
+                            TaskAction::Create(task) => {
+                                self.tasks.push(task);
+                                self.save_tasks()?
+                            }
+                            TaskAction::ToggleDone(idx) => {
                                 self.tasks[idx].toggle_done();
+                                self.save_tasks()?
                             }
-                            self.save_tasks()?;
-                        }
-                        KeyCode::Delete => {
-                            if let Some(idx) = self.tasklist_state.selected()
-                                && idx < self.tasks.len()
-                            {
+                            TaskAction::Delete(idx) => {
                                 self.tasks.remove(idx);
-                                self.tasklist_state.deselect();
+                                self.save_tasks()?
                             }
-                            self.save_tasks()?;
-                        }
-                        KeyCode::Char('a') => {
-                            self.is_adding_task = true;
-                        }
-                        KeyCode::Char('s') => self.save_tasks()?,
-                        KeyCode::Char('p') if self.tasklist_state.selected().is_some() => {
-                            let idx = self.tasklist_state.selected().unwrap();
-                            let task = self.tasks.remove(idx);
-                            let new_priority = task.priority().next();
-                            self.tasks.insert(idx, task.with_priority(new_priority));
-                            self.save_tasks()?;
-                        }
-                        _ => {}
+                            TaskAction::Save => self.save_tasks()?,
+                            TaskAction::NextPriority(idx) => {
+                                let t = self.tasks.remove(idx);
+                                let new_priority = t.priority().next();
+                                self.tasks.insert(idx, t.with_priority(new_priority));
+                                self.save_tasks()?
+                            }
+                            _ => {}
+                        },
+                        AppAction::None => {}
                     }
                 }
             }
