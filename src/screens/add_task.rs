@@ -38,7 +38,7 @@ impl StatefulWidget for AddTaskScreen {
             return;
         };
         let input_block = Block::bordered();
-        let area = input_block.inner(input_label_chunk);
+        let area = input_block.inner(input_block_chunk);
 
         let width = area.width as usize;
         let scroll_width = state.title_input_state.visual_scroll(width) as u16;
