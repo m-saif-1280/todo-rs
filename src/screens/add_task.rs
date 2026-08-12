@@ -1,8 +1,9 @@
 use ratatui::{
     crossterm::event::{Event, KeyCode},
+    layout::HorizontalAlignment,
     macros::{horizontal, vertical},
     prelude::{Buffer, Rect, StatefulWidget},
-    widgets::{Block, Clear, Paragraph, Widget},
+    widgets::{Block, BorderType, Clear, Paragraph, Widget},
 };
 use tui_input::{Input, backend::crossterm::EventHandler};
 
@@ -20,20 +21,23 @@ impl StatefulWidget for AddTaskScreen {
     type State = AddTaskScreenState;
 
     fn render(self, frame_area: Rect, buf: &mut Buffer, state: &mut Self::State) {
-        let chunk = horizontal!(==10%, ==80%, ==10%).split(frame_area)[1];
-        let chunk = vertical!(==10%, ==80%, ==10%).split(chunk)[1];
-        let block = Block::bordered().title_top(" Enter task title ");
-        let area = block.inner(chunk);
+        let master_chunk = horizontal!(==10%, ==80%, ==10%).split(frame_area)[1];
+        let master_chunk = vertical!(==10%, ==80%, ==10%).split(master_chunk)[1];
+        let master_block = Block::bordered()
+            .title_top(" Enter task title ")
+            .title_alignment(HorizontalAlignment::Center)
+            .border_type(BorderType::Rounded);
+        let area = master_block.inner(master_chunk);
 
         let width = area.width as usize;
         let scroll_width = state.title_input_state.visual_scroll(width) as u16;
 
         let widget = Paragraph::new(state.value())
             .scroll((0, scroll_width))
-            .block(block);
+            .block(master_block);
 
-        Clear.render(chunk, buf);
-        widget.render(chunk, buf);
+        Clear.render(master_chunk, buf);
+        widget.render(master_chunk, buf);
     }
 }
 
