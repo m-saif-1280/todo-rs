@@ -1,9 +1,9 @@
 use ratatui::{
     crossterm::event::{Event, KeyCode},
     layout::HorizontalAlignment,
-    macros::{horizontal, vertical},
+    macros::{horizontal, line, vertical},
     prelude::{Buffer, Rect, StatefulWidget},
-    widgets::{Block, BorderType, Clear, Paragraph, Widget},
+    widgets::{Block, BorderType, Clear, Padding, Paragraph, Widget},
 };
 use tui_input::{Input, backend::crossterm::EventHandler};
 
@@ -26,18 +26,29 @@ impl StatefulWidget for AddTaskScreen {
         let master_block = Block::bordered()
             .title_top(" Enter task title ")
             .title_alignment(HorizontalAlignment::Center)
+            .padding(Padding::uniform(1))
             .border_type(BorderType::Rounded);
-        let area = master_block.inner(master_chunk);
+        let master_area = master_block.inner(master_chunk);
+
+        Clear.render(master_chunk, buf);
+        master_block.render(master_chunk, buf);
+
+        let [input_label_chunk, input_block_chunk] = *horizontal!(==25%, *=1).split(master_area)
+        else {
+            return;
+        };
+        let input_block = Block::bordered();
+        let area = input_block.inner(input_label_chunk);
 
         let width = area.width as usize;
         let scroll_width = state.title_input_state.visual_scroll(width) as u16;
 
         let widget = Paragraph::new(state.value())
             .scroll((0, scroll_width))
-            .block(master_block);
+            .block(input_block);
 
-        Clear.render(master_chunk, buf);
-        widget.render(master_chunk, buf);
+        line!("Title: ").centered().render(input_label_chunk, buf);
+        widget.render(input_block_chunk, buf);
     }
 }
 
